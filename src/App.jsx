@@ -1,107 +1,120 @@
-import { useState } from "react";
-import Footer from "./components/Footer";
-import Header from "./components/Header";
-import NotesGrid from "./components/NotesGrid";
-import Sidebar from "./components/Siderbar";
-import Summery from "./components/Summary";
-import NoteCard from "./components/NoteCard";
+// QuizOfKinz.jsx
+import { useReducer } from "react";
 
-const getLocalNotes = () => {
-  const saved = localStorage.getItem("notes-app");
-  return saved ? JSON.parse(saved) : [];
+const questions = [
+  {
+    id: 1,
+    question: "پایتخت فرانسه کدام است؟",
+    options: ["برلین", "پاریس", "رم", "مادرید"],
+    answer: "پاریس",
+  },
+  {
+    id: 2,
+    question: "بزرگ‌ترین سیاره منظومه شمسی؟",
+    options: ["زمین", "مریخ", "زحل", "مشتری"],
+    answer: "مشتری",
+  },
+  {
+    id: 3,
+    question: "زبان اصلی مرورگرها چیست؟",
+    options: ["Python", "C++", "JavaScript", "PHP"],
+    answer: "JavaScript",
+  },
+];
+
+const initialState = {
+  index: 0,
+  showResult: false,
+  score: 0,
+  selected: null,
 };
 
-function App() {
-  const [notes, setNotes] = useState(getLocalNotes());
-  const [selectedColor, setSelectedColor] = useState("#facc15");
-  const [filterPinned, setFilterPinned] = useState(false);
-  const [search, setSearch] = useState("");
+function quizReducer(state, action) {
+  switch (action.type) {
+    case "answer": {
+      const correct = questions[state.index].answer === action.payload ? 1 : 0;
+      return {
+        ...state,
+        score: state.score + correct,
+        selected: action.payload,
+      };
+    }
+    case "next": {
+      const nextIndex = state.index + 1;
+      const isEnd = nextIndex >= questions.length;
+      return {
+        ...state,
+        index: nextIndex,
+        showResult: isEnd,
+        selected: null,
+      };
+    }
+    case "restart":
+      return initialState;
+    default:
+      return state;
+  }
+}
 
-  const syncToStorage = (updated) => {
-    setNotes(updated);
-    localStorage.setItem("notes-app", JSON.stringify(updated));
-  };
-
-  const addNote = () => {
-    const newNote = {
-      id: Date.now(),
-      text: "",
-      color: selectedColor,
-      date: new Date().toLocaleString(),
-      pinned: false,
-    };
-    const updated = [newNote, ...notes];
-    syncToStorage(updated);
-  };
-
-  const updateText = (id, text) => {
-    const updated = notes.map((note) =>
-      note.id === id ? { ...note, text } : note
-    );
-    syncToStorage(updated);
-  };
-
-  const togglePinned = (id) => {
-    const updated = notes.map((note) =>
-      note.id === id ? { ...note, pinned: !note.pinned } : note
-    );
-    syncToStorage(updated);
-  };
-
-  const deleteNode = (id) => {
-    const updated = notes.filter((note) => note.id !== id);
-    syncToStorage(updated);
-  };
-
-  const clearAll = () => {
-    syncToStorage([]);
-  };
-
-  const filterNotes = notes.filter((note) => {
-    return (
-      note.text.toLowerCase().includes(search.toLowerCase()) &&
-      (!filterPinned || note.pinned)
-    );
-  });
+export default function QuizOfKinz() {
+  const [state, dispatch] = useReducer(quizReducer, initialState);
+  const current = questions[state.index];
 
   return (
-    <div className="flex flex-col w-screen min-h-screen bg-gradient-to-br from-yellow-50 via-pink-100 to-indigo-100">
-      <div className="flex flex-1">
-        <Sidebar
-          onColorSelect={setSelectedColor}
-          selectedColor={selectedColor}
-          onAdd={addNote}
-        />
-        <main className="flex-1 p-10">
-          <Header
-            clearAll={clearAll}
-            filterPinned={setFilterPinned}
-            filterPinnedValue={filterPinned}
-            setSearch={setSearch}
-            searchValue={search}
-          />
-          <Summery
-            total={notes.length}
-            pinned={notes.filter((e) => e.pinned).length}
-          />
-          <NotesGrid>
-            {filterNotes
-              .sort((a, b) => b.pinned - a.pinned)
-              .map((note) => (
-                <NoteCard
-                  key={note.id}
-                  note={note}
-                  onUpdateText={(text) => updateText(note.id, text)}
-                  onTogglePin={() => togglePinned(note.id)}
-                  onDeleteNode={() => deleteNode(note.id)}
-                />
+    <div
+      dir="rtl"
+      className="min-h-screen w-screen bg-gradient-to-tr from-purple-900 via-indigo-900 to-blue-900 flex items-center justify-center text-white">
+      <div className="w-full max-w-xl bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-2xl">
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          🧠 QuizOfKinz 🧠
+        </h1>
+
+        {state.showResult ? (
+          <div className="text-center">
+            <h2 className="text-xl mb-4">نتیجه نهایی شما:</h2>
+            <p className="text-4xl font-bold text-green-400 mb-6">
+              {state.score} / {questions.length}
+            </p>
+            <button
+              onClick={() => dispatch({ type: "restart" })}
+              className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl">
+              شروع مجدد
+            </button>
+          </div>
+        ) : (
+          <>
+            <h2 className="text-xl font-semibold mb-4">{current.question}</h2>
+            <div className="grid grid-cols-1 gap-3 mb-6">
+              {current.options.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => dispatch({ type: "answer", payload: opt })}
+                  disabled={state.selected !== null}
+                  className={`px-4 py-2 rounded-xl border transition-all duration-300 
+                    ${
+                      state.selected === opt
+                        ? opt === current.answer
+                          ? "bg-green-500 border-green-600"
+                          : "bg-red-500 border-red-600"
+                        : "hover:bg-white/10 border-white/20"
+                    }
+                  `}>
+                  {opt}
+                </button>
               ))}
-          </NotesGrid>
-        </main>
+            </div>
+            {state.selected && (
+              <div className="flex justify-end">
+                <button
+                  onClick={() => dispatch({ type: "next" })}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-xl">
+                  سوال بعدی
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
-      <Footer />
     </div>
   );
 }
-
-export default App;
