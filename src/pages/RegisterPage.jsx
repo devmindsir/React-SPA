@@ -36,18 +36,14 @@ const RegisterPage = () => {
               <input
                 type="text"
                 placeholder="نام کامل"
-                className="w-full pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                className="form-input"
               />
             </div>
 
             {/* ایمیل */}
             <div className="relative">
               <FaEnvelope className="absolute right-4 top-3 text-gray-400" />
-              <input
-                type="email"
-                placeholder="ایمیل"
-                className="w-full pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-              />
+              <input type="email" placeholder="ایمیل" className="form-input" />
             </div>
 
             {/* رمز عبور */}
@@ -56,7 +52,7 @@ const RegisterPage = () => {
               <input
                 type="password"
                 placeholder="رمز عبور"
-                className="w-full pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                className="form-input"
               />
             </div>
 
@@ -66,13 +62,11 @@ const RegisterPage = () => {
               <input
                 type="password"
                 placeholder="تایید رمز عبور"
-                className="w-full pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                className="form-input"
               />
             </div>
 
-            <button
-              type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold text-sm transition">
+            <button type="submit" className="btn-primary w-full py-2">
               ساخت حساب کاربری
             </button>
 

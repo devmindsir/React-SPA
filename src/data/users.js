@@ -3,7 +3,7 @@ const users = [
     id: 1,
     name: "علی رضایی",
     email: "ali.rezaei@example.com",
-    password: "hashed_password_1",
+    password: "123",
     role: "student",
     avatar: "/images/users/1.png",
     purchasedCourses: [1, 3],

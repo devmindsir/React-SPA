@@ -12,7 +12,6 @@ function Home() {
         <Course />
         <Article />
       </div>
-      ;
     </>
   );
 }

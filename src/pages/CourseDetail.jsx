@@ -28,7 +28,7 @@ const CourseDetail = () => {
             />
             <Instructor teacher={course.teacher} />
             <Season outline={course.outline} />
-            <Price price={course.price} />
+            <Price course={course} />
           </div>
         </div>
       </main>
